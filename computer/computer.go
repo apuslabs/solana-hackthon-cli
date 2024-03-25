@@ -3,49 +3,46 @@ package computer
 import (
 	"fmt"
 	"os/exec"
+	"regexp"
+	"strings"
 )
 
 var cuda_version string
 
 // 检查 nvidia-smi 查看是否有检查docker环境版本
 func Init() {
-	CheckNvidiaSmi()
+	cuda_version = CheckNvidiaSmi()
+	fmt.Println("cuda version: ", cuda_version)
+	GpuCardCheck()
 	CheckDocker()
-	cuda_version = GetCudaVersion()
-	RegisterNode()
 }
 
-func CheckNvidiaSmi() {
-	_, err := exec.Command("nvidia-smi").Output()
+func CheckNvidiaSmi() string {
+	informationByte, err := exec.Command("nvidia-smi").Output()
 	if err != nil {
-		panic("nividia-smi error; msg:" + err.Error())
+		panic("cmd nividia-smi error; msg:" + err.Error())
 	}
+	info := string(informationByte)
+	result := regexp.MustCompile("CUDA Version:\\s+(\\d+(\\.\\d+)+)").FindString(info)
+	return regexp.MustCompile("\\d+(\\.\\d+)+").FindString(result)
 }
 
-func GetCudaVersion() string {
-	version, err := exec.Command("nvidia-smi", "--query-gpu", "cuda_version").Output()
+func GpuCardCheck() {
+	infomationByte, err := exec.Command("nvidia-smi", "-L").Output()
 	if err != nil {
-		panic("nividia-smi error; msg:" + err.Error())
+		panic("cmd nividia-smi error; msg:" + err.Error())
 	}
-	fmt.Printf("cuda_version: %s\n", string(version))
-	return string(version)
-}
-
-func GetGpuCards() []string {
-	_, err := exec.Command("nvidia-smi").Output()
-	if err != nil {
-		panic("nividia-smi error; msg:" + err.Error())
+	info := string(infomationByte)
+	if !strings.Contains(info, "UUID") {
+		panic("not found GPU")
 	}
-	return []string{}
 }
 
 func CheckDocker() {
-	_, err := exec.Command("docker", "version").Output()
+	dockerVersionByte, err := exec.Command("docker", "-v").Output()
 	if err != nil {
-		panic("docker version error; msg:" + err.Error())
+		panic("cmd docker version error; msg:" + err.Error())
 	}
-}
-
-func RegisterNode() {
-
+	version := regexp.MustCompile("\\d+(\\.\\d+)+").FindString(string(dockerVersionByte))
+	fmt.Println("docker version: ", version)
 }

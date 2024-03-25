@@ -1,11 +1,8 @@
 package ca
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/blocto/solana-go-sdk/client"
-	"github.com/blocto/solana-go-sdk/rpc"
 	"github.com/blocto/solana-go-sdk/types"
 	"io"
 	"os"
@@ -26,21 +23,6 @@ func Init() {
 	} else {
 		pubkey_id = GenerateKey()
 	}
-}
-
-// 查询agent信息
-func Agents() []string {
-	// create a RPC client
-	c := client.NewClient(rpc.MainnetRPCEndpoint)
-
-	// get the current running Solana version
-	response, err := c.GetVersion(context.TODO())
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Println("version", response.SolanaCore)
-	return []string{}
 }
 
 func GenerateKey() string {
@@ -83,4 +65,23 @@ func ReadLocalKey() string {
 
 func GetPubkey() string {
 	return pubkey_id
+}
+
+type Agent struct {
+	Owner           string `json:"owner"`
+	Post            string `json:"post"`
+	Title           string `json:"title"`
+	Description     string `json:"description"`
+	ModelHash       string `json:"model_hash"` // container name: imageherf-hash
+	ModelType       string `json:"model_type"`
+	ApiType         string `json:"api_type"`
+	ApiDoc          string `json:"api_doc"`
+	Price           string `json:"price"`
+	DockerImageHref string `json:"docker_image_href"` // image name
+	ApiDefaultPort  int64  `json:"api_default_port"`  // image port
+}
+
+// 查询agent信息
+func Agents() []Agent {
+	return []Agent{}
 }
