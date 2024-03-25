@@ -57,3 +57,7 @@ func startAgents(containers []types.Container) {
 		index_Port = index_Port + 1
 	}
 }
+
+func GetPort(hash string) int64 {
+	return hashPortMap[hash]
+}
