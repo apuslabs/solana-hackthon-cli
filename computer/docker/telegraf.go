@@ -2,33 +2,47 @@ package docker
 
 import (
 	"github.com/docker/docker/api/types"
+	"os/exec"
 	"strings"
 )
 
-const image_name = "telegraf"
-const image_port = 8086
-const host_port = 10001
-const container_name = "telegraf"
+const git_local = "https://github.com/apuslabs/solana-hackthon-images.git"
+const container_telegraf = "telegraf"
+const container_influxdb = "influxdb"
 
-// 启动监控程序
+// 拉取docker-compose.yaml 执行docker-compose up -d
 func startTelegraf(containers []types.Container) {
 	// 判断是否已经有telegraf
-	flag := false
+	telegrafFlag := false
+	influxdbFlag := false
 	for _, container := range containers {
-		if strings.Contains(container.Names[0], container_name) {
-			flag = true
+		if strings.Contains(container.Names[0], container_telegraf) {
+			telegrafFlag = true
+		}
+		if strings.Contains(container.Names[0], container_influxdb) {
+			influxdbFlag = true
 		}
 	}
-	if !flag {
-		dockerfileds := DockerFileds{
-			Image:         image_name,
-			Port:          image_port,
-			HostPort:      host_port,
-			ContainerName: container_name,
-		}
-		err := startImage(dockerfileds)
-		if err != nil {
-			panic(err)
-		}
+	// 两个都启动才不执行up -d
+	if telegrafFlag && influxdbFlag {
+		return
+	}
+	downLoad()
+	start()
+}
+
+func downLoad() {
+	_, err := exec.Command("git", "clone", git_local).Output()
+	if err != nil {
+		panic("down load telegraf failed; error msg:" + err.Error())
+	}
+}
+
+func start() {
+	cmd := exec.Command("docker-compose", "up", "-d")
+	cmd.Dir = "./solana-hackthon-images"
+	err := cmd.Run()
+	if err != nil {
+		panic("cmd [docker-compose up -d] failed; error msg:" + err.Error())
 	}
 }

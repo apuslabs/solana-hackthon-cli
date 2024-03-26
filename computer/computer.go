@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os/exec"
 	"regexp"
+	"solana-hackthon-cli/computer/docker"
+	"solana-hackthon-cli/computer/monitor"
 	"strings"
 )
 
@@ -15,6 +17,11 @@ func Init() {
 	fmt.Println("cuda version: ", cuda_version)
 	GpuCardCheck()
 	CheckDocker()
+	CheckDockerComputer()
+	CheckGit()
+
+	docker.Init()
+	monitor.Init()
 }
 
 func CheckNvidiaSmi() string {
@@ -45,4 +52,20 @@ func CheckDocker() {
 	}
 	version := regexp.MustCompile("\\d+(\\.\\d+)+").FindString(string(dockerVersionByte))
 	fmt.Println("docker version: ", version)
+}
+
+func CheckDockerComputer() {
+	dockerVersionByte, err := exec.Command("docker-compose", "-v").Output()
+	if err != nil {
+		panic("cmd docker-compose -v error; msg:" + err.Error())
+	}
+	version := regexp.MustCompile("v\\d+(\\.\\d+)+").FindString(string(dockerVersionByte))
+	fmt.Println("docker-compose version: ", version)
+}
+
+func CheckGit() {
+	_, err := exec.Command("git", "version").Output()
+	if err != nil {
+		panic("cmd git version error; msg:" + err.Error())
+	}
 }

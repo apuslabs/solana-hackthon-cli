@@ -1,7 +1,5 @@
 package server
 
-const SERVER_PORT = 10000
-
 type Response struct {
 	Code int         `json:"code"`
 	Msg  string      `json:"msg"`

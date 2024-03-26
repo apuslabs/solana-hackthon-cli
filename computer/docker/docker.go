@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/image"
+	"github.com/docker/docker/api/types/strslice"
 	"github.com/docker/docker/client"
 	"github.com/docker/go-connections/nat"
 	"strconv"
 	"strings"
+	"time"
 )
 
 var dockerClient *client.Client
@@ -22,20 +24,36 @@ type DockerFileds struct {
 
 // 拉取和管理docker容器，缓存容器：port映射 host网络模式
 func Init() {
-	dc, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation(), client.WithHost("tcp://:2375"))
+	dc, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
 		fmt.Println(" Unable to create docker client; msg: ", err.Error())
 		panic(err)
 	}
 	dockerClient = dc
-	containers, err := dockerClient.ContainerList(context.Background(), container.ListOptions{All: true})
+	containers, err := dockerClient.ContainerList(context.Background(), container.ListOptions{})
 	if err != nil {
 		fmt.Println(" can not search docker canisters; msg: ", err.Error())
 		panic(err)
 	}
 	startTelegraf(containers)
 	startAgents(containers)
-	keepalive()
+	loopPullAgent()
+}
+
+func loopPullAgent() {
+	ticker := time.NewTicker(60 * time.Second)
+	go func() {
+		for {
+			select {
+			case <-ticker.C:
+				containers, err := dockerClient.ContainerList(context.Background(), container.ListOptions{})
+				if err != nil {
+					fmt.Println(" can not search docker canisters; msg: ", err.Error())
+				}
+				startAgents(containers)
+			}
+		}
+	}()
 }
 
 // 不是正在运行的容器一律删除重新创建启动
@@ -48,7 +66,7 @@ func startImage(fileds DockerFileds) error {
 	if err != nil {
 		return err
 	}
-	id, err := createImage(fileds)
+	id, err := createContainer(fileds)
 	if err != nil {
 		return err
 	}
@@ -70,7 +88,7 @@ func pullImage(imageName string) error {
 	return nil
 }
 
-func createImage(dockerfileds DockerFileds) (string, error) {
+func createContainer(dockerfileds DockerFileds) (string, error) {
 	ctx := context.Background()
 	port := nat.Port(fmt.Sprintf("%d/tcp", dockerfileds.Port))
 	hostPort := strconv.FormatInt(dockerfileds.HostPort, 10)
@@ -80,6 +98,7 @@ func createImage(dockerfileds DockerFileds) (string, error) {
 			ExposedPorts: nat.PortSet{
 				port: {},
 			},
+			Cmd: strslice.StrSlice{"--gpus=all"},
 		},
 		&container.HostConfig{
 			PortBindings: nat.PortMap{
@@ -117,14 +136,4 @@ func clearContainer(containerName string) error {
 		return err
 	}
 	return nil
-}
-
-func keepalive() {
-	// channel通信，启动线程设置channel信号，另一个线程监听。hover错误直接return. 防止进程挂掉
-	containers, err := dockerClient.ContainerList(context.Background(), container.ListOptions{})
-	if err != nil {
-		fmt.Println(" can not search docker canisters; msg: ", err.Error())
-	}
-	startTelegraf(containers)
-	startAgents(containers)
 }

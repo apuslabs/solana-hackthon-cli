@@ -3,7 +3,6 @@ package startup
 import (
 	"solana-hackthon-cli/ca"
 	"solana-hackthon-cli/computer"
-	"solana-hackthon-cli/computer/docker"
 	"solana-hackthon-cli/config"
 )
 
@@ -12,7 +11,6 @@ func Startup() {
 	config.Init()
 	ca.Init()
 	computer.Init()
-	docker.Init()
 	RegisterGpuNode()
 }
 
