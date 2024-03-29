@@ -3,6 +3,7 @@ package startup
 import (
 	"solana-hackthon-cli/ca"
 	"solana-hackthon-cli/computer"
+	"solana-hackthon-cli/computer/monitor"
 	"solana-hackthon-cli/config"
 )
 
@@ -10,10 +11,14 @@ import (
 func Startup() {
 	config.Init()
 	ca.Init()
-	computer.Init()
-	RegisterGpuNode()
+	gpuNode := computer.Init()
+	RegisterGpuNode(gpuNode)
 }
 
-func RegisterGpuNode() {
-
+func RegisterGpuNode(gpuNode monitor.GpuNode) {
+	gpuNode.Owner = config.OwnerPubkey
+	gpuNode.Id = ca.GetPubkey()
+	gpuNode.Price = config.Price
+	gpuNode.Endpoint = config.Endpoint
+	// http request
 }

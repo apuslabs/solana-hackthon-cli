@@ -6,9 +6,10 @@ import (
 
 var OwnerPubkey string
 var ServerAddress string
-var ProgramId string
 var Price int64
 var Endpoint string
+
+var ProgramId string
 
 func init() {
 	flag.StringVar(&OwnerPubkey, "ownerpubkey", "", "node owner publickey")

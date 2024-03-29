@@ -29,15 +29,12 @@ func HealthCheckHandler(c *gin.Context) {
 		return
 	}
 	health := monitor.GetHealth()
-	if !health {
-		c.JSON(http.StatusOK, Response{Code: 200, Msg: "", Data: Health{Busy: true, Port: "0"}})
-		return
-	}
 	port := docker.GetPort(agent)
-	if port == 0 {
+	if !health || port == 0 {
 		c.JSON(http.StatusOK, Response{Code: 200, Msg: "", Data: Health{Busy: true, Port: "0"}})
 		return
 	}
+
 	c.JSON(http.StatusOK, Response{Code: 200, Msg: "", Data: Health{Busy: false, Port: strconv.FormatInt(port, 10)}})
 
 }

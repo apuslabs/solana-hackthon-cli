@@ -41,11 +41,16 @@ func Init() {
 }
 
 func loopPullAgent() {
-	ticker := time.NewTicker(60 * time.Second)
+	ticker := time.NewTicker(30 * time.Second)
 	go func() {
 		for {
 			select {
 			case <-ticker.C:
+				defer func() {
+					if err := recover(); err != nil {
+						fmt.Println(" loop pull agent error; msg:", err)
+					}
+				}()
 				containers, err := dockerClient.ContainerList(context.Background(), container.ListOptions{})
 				if err != nil {
 					fmt.Println(" can not search docker canisters; msg: ", err.Error())

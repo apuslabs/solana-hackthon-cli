@@ -35,7 +35,7 @@ func Agents() []Agent {
 }
 
 func startAgents(containers []types.Container) {
-	// 合约拉取agentinfo
+	// 拉取agentinfo
 	agents := Agents()
 	// agentinfo设置map缓存
 	for _, agent := range agents {
