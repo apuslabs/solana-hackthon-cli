@@ -7,6 +7,6 @@ type Response struct {
 }
 
 type Health struct {
-	Busy bool   `json:"busy"`
-	Port string `json:"port"`
+	Busy bool  `json:"busy"`
+	Port int64 `json:"port"`
 }
