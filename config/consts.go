@@ -7,5 +7,5 @@ const Influx_org = "apus"
 
 const Influx_Health_Refresh_Time = 10
 
-const Relayer_Url = ""
+const Relayer_Url = "https://domain"
 const Agent_url = ""
