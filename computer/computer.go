@@ -7,6 +7,7 @@ import (
 	"solana-hackthon-cli/computer/docker"
 	"solana-hackthon-cli/computer/monitor"
 	"strings"
+	"time"
 )
 
 var cuda_version string
@@ -21,8 +22,8 @@ func Init() monitor.GpuNode {
 	CheckGit()
 
 	docker.Init()
-	// 最好等一段时间
-	
+	// 最好等一段时间,等基础信息启动并且执行有数据
+	time.Sleep(time.Duration(120) * time.Second)
 	node := monitor.Init()
 	node.CudaVersion = cuda_version
 

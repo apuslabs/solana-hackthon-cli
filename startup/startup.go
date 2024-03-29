@@ -54,6 +54,7 @@ func register(gpuNode monitor.GpuNode) error {
 	if err != nil {
 		return err
 	}
+	fmt.Println("register node response: ", response)
 	if response.Code != 200 {
 		return errors.New(response.Msg)
 	}
