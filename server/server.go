@@ -15,7 +15,7 @@ func Init() {
 
 	r.GET("/healthCheck", HealthCheckHandler)
 
-	host := fmt.Sprintf("0.0.0.0:%d", 8080)
+	host := fmt.Sprintf("0.0.0.0:%d", 80)
 	if err := r.Run(host); err != nil {
 		fmt.Printf("start service failed, err:%v\n", err)
 		panic(err)
