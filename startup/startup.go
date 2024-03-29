@@ -1,6 +1,7 @@
 package startup
 
 import (
+	"fmt"
 	"solana-hackthon-cli/ca"
 	"solana-hackthon-cli/computer"
 	"solana-hackthon-cli/computer/monitor"
@@ -21,4 +22,13 @@ func RegisterGpuNode(gpuNode monitor.GpuNode) {
 	gpuNode.Price = config.Price
 	gpuNode.Endpoint = config.Endpoint
 	// http request
+	err := register(gpuNode)
+	if err != nil {
+		fmt.Println("注册机器节点上链失败", err)
+		panic(err)
+	}
+}
+
+func register(gpuNode monitor.GpuNode) error {
+	return nil
 }
