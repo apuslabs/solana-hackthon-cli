@@ -43,7 +43,7 @@ func RefreshHealth() {
 			select {
 			case <-ticker.C:
 				if config.SkipGpu {
-					health = true
+					health = false
 					return
 				}
 				health = false
