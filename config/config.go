@@ -38,7 +38,7 @@ func Init() {
 			fmt.Println("can not get endpoint; err:", err.Error())
 			panic("programid must be set: endpoint for access this node: ip/domain")
 		}
-		fmt.Println("ip:", result)
+		fmt.Println("ip:", string(result))
 		Endpoint = fmt.Sprintf("http://%s:80", string(result))
 
 	}
