@@ -89,6 +89,7 @@ func startImage(fileds DockerFileds) error {
 	// docker run -p 80:80 --name=aiagent --gpus=all johnxiaohe/aiagent:latest
 	_, err = exec.Command("docker",
 		"run",
+		"-d",
 		fmt.Sprintf("--name=%s", fileds.ContainerName),
 		//"--gpus", "all",
 		fmt.Sprintf("-p %s:%s", fileds.HostPort, fileds.Port),
