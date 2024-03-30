@@ -8,6 +8,7 @@ import (
 	"github.com/docker/docker/api/types/strslice"
 	"github.com/docker/docker/client"
 	"github.com/docker/go-connections/nat"
+	"solana-hackthon-cli/config"
 	"strconv"
 	"strings"
 	"time"
@@ -35,7 +36,9 @@ func Init() {
 		fmt.Println(" can not search docker canisters; msg: ", err.Error())
 		panic(err)
 	}
-	startTelegraf(containers)
+	if !config.SkipGpu {
+		startTelegraf(containers)
+	}
 	err = startAgents(containers)
 	if err != nil {
 		fmt.Println(" can not pull agents; msg: ", err.Error())

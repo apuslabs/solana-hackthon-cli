@@ -20,6 +20,9 @@ func GetHealth() bool {
 }
 
 func Init() GpuNode {
+	if config.SkipGpu {
+		return GpuNode{CpuCores: 8, Memory: 1024, Storage: 1024, GpuCardModel: "NVIDIA RTX 4090"}
+	}
 	client = influxdb2.NewClient(config.Influx_url, config.Influx_token)
 	queryAPI = client.QueryAPI(config.Influx_org)
 	core := GetCpu()
@@ -39,6 +42,10 @@ func RefreshHealth() {
 		for {
 			select {
 			case <-ticker.C:
+				if config.SkipGpu {
+					health = true
+					return
+				}
 				health = false
 				defer func() {
 					if err := recover(); err != nil {
@@ -158,9 +165,6 @@ func GetDisk() int64 {
 }
 
 func GetGpu() string {
-	if config.SkipGpu {
-		return "NVIDIA RTX 4090"
-	}
 	query := `from(bucket: "gpu")
 			  |> range(start: -2m)
 			  |> filter(fn: (r) => r["_measurement"] == "nvidia_smi")
