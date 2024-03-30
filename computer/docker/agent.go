@@ -53,6 +53,9 @@ func startAgents(containers []types.Container) error {
 	}
 	// agentinfo设置map缓存
 	for _, agent := range agents {
+		if agent.DefaultPort == 0 {
+			continue
+		}
 		agentMap[agent.Id] = agent
 		agentTempMap[agent.Id] = 0
 	}
