@@ -2,6 +2,8 @@ package config
 
 import (
 	"flag"
+	"fmt"
+	"os/exec"
 )
 
 var OwnerPubkey string
@@ -13,7 +15,7 @@ var SkipGpu bool
 
 func init() {
 	flag.StringVar(&OwnerPubkey, "ownerpubkey", "", "node owner publickey")
-	flag.StringVar(&ServerAddress, "serveraddress", "", "register server address: https://host:port")
+	flag.StringVar(&ServerAddress, "serveraddress", "https://solapi.apus.network:3000", "register server address: https://host:port")
 	flag.StringVar(&Price, "price", "0", "price for ai task")
 	flag.StringVar(&Endpoint, "endpoint", "", "endpoint for access this node: ip/domain")
 	flag.BoolVar(&SkipGpu, "skipgpu", false, "")
@@ -31,6 +33,13 @@ func Init() {
 	}
 
 	if Endpoint == "" {
-		panic("programid must be set: endpoint for access this node: ip/domain")
+		result, err := exec.Command("curl", "ifconfig.me").Output()
+		if err != nil {
+			fmt.Println("can not get endpoint; err:", err.Error())
+			panic("programid must be set: endpoint for access this node: ip/domain")
+		}
+		fmt.Println("ip:", result)
+		Endpoint = fmt.Sprintf("http://%s:80", string(result))
+
 	}
 }
