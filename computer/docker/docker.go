@@ -1,12 +1,14 @@
 package docker
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/client"
 	"github.com/docker/go-connections/nat"
+	"os/exec"
 	"solana-hackthon-cli/config"
 	"strconv"
 	"strings"
@@ -77,26 +79,33 @@ func startImage(fileds DockerFileds) error {
 	if err != nil {
 		return err
 	}
-	id, err := createContainer(fileds)
-	if err != nil {
-		return err
-	}
-	err = startContainer(id)
-	if err != nil {
-		return err
-	}
-	// docker run -p 80:80 --name=aiagent --gpus=all johnxiaohe/aiagent:latest
-	//_, err = exec.Command("docker",
-	//	"run",
-	//	"-d",
-	//	fmt.Sprintf("--name=%s", fileds.ContainerName),
-	//	//"--gpus", "all",
-	//	fmt.Sprintf("-p %s:%s", fileds.HostPort, fileds.Port),
-	//	fileds.Image).Output()
+	//id, err := createContainer(fileds)
 	//if err != nil {
-	//	fmt.Println("cmd docker run error; msg:" + err.Error())
 	//	return err
 	//}
+	//err = startContainer(id)
+	//if err != nil {
+	//	return err
+	//}
+	// docker run -p 80:80 --name=aiagent --gpus=all johnxiaohe/aiagent:latest
+	cmd := exec.Command("docker",
+		"run",
+		"-d",
+		fmt.Sprintf("--name=%s", fileds.ContainerName),
+		//"--gpus", "all",
+		fmt.Sprintf("-p %s:%s", fileds.HostPort, fileds.Port),
+		fileds.Image)
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+	err = cmd.Run()
+	if err != nil {
+		fmt.Println("cmd docker run error; msg:" + err.Error())
+		fmt.Println(stderr.String())
+		fmt.Println(stdout.String())
+		return err
+	}
 	fmt.Println("create and run docker canister success; canisterName: ", fileds.ContainerName)
 	return nil
 }
