@@ -1,6 +1,6 @@
 module solana-hackthon-cli
 
-go 1.21.4
+go 1.18.1
 
 require (
 	filippo.io/edwards25519 v1.0.0-rc.1 // indirect
