@@ -91,10 +91,11 @@ func startImage(fileds DockerFileds) error {
 	fmt.Println(fmt.Sprintf("-p %d:%d", fileds.HostPort, fileds.Port))
 	cmd := exec.Command("docker",
 		"run",
-		"-d ",
-		fmt.Sprintf("--name=%s ", fileds.ContainerName),
+		"-d",
+		fmt.Sprintf("--name=%s", fileds.ContainerName),
 		//"--gpus", "all",
-		fmt.Sprintf("-p %d:%d ", fileds.HostPort, fileds.Port),
+		"-p",
+		fmt.Sprintf("%d:%d", fileds.HostPort, fileds.Port),
 		fileds.Image)
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
