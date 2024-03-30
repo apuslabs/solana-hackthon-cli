@@ -88,7 +88,6 @@ func startImage(fileds DockerFileds) error {
 	//	return err
 	//}
 	// docker run -p 80:80 --name=aiagent --gpus=all johnxiaohe/aiagent:latest
-	fmt.Println(fmt.Sprintf("-p %d:%d", fileds.HostPort, fileds.Port))
 	cmd := exec.Command("docker",
 		"run",
 		"-d",
