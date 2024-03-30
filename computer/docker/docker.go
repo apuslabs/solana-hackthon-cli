@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/image"
-	"github.com/docker/docker/api/types/strslice"
 	"github.com/docker/docker/client"
 	"github.com/docker/go-connections/nat"
+	"os/exec"
 	"solana-hackthon-cli/config"
 	"strconv"
 	"strings"
@@ -78,15 +78,26 @@ func startImage(fileds DockerFileds) error {
 	if err != nil {
 		return err
 	}
-	id, err := createContainer(fileds)
+	//id, err := createContainer(fileds)
+	//if err != nil {
+	//	return err
+	//}
+	//err = startContainer(id)
+	//if err != nil {
+	//	return err
+	//}
+	// docker run -p 80:80 --name=aiagent --gpus=all johnxiaohe/aiagent:latest
+	_, err = exec.Command("docker",
+		"run",
+		"--name", fileds.ContainerName,
+		//"--gpus", "all",
+		"-p", fmt.Sprintf("%s:%s", fileds.HostPort, fileds.Port),
+		fileds.Image).Output()
 	if err != nil {
+		fmt.Println("cmd docker run error; msg:" + err.Error())
 		return err
 	}
-	err = startContainer(id)
-	if err != nil {
-		return err
-	}
-	fmt.Println("create and run docker canister success; id: ", id)
+	fmt.Println("create and run docker canister success; canisterName: ", fileds.ContainerName)
 	return nil
 }
 
@@ -107,10 +118,10 @@ func createContainer(dockerfileds DockerFileds) (string, error) {
 	createResponse, err := dockerClient.ContainerCreate(ctx,
 		&container.Config{
 			Image: dockerfileds.Image,
-			ExposedPorts: nat.PortSet{
-				port: {},
-			},
-			Cmd: strslice.StrSlice{"--gpus=all"},
+			//ExposedPorts: nat.PortSet{
+			//	port: {},
+			//},
+			//Cmd: strslice.StrSlice{"--gpus=all"},
 		},
 		&container.HostConfig{
 			PortBindings: nat.PortMap{
