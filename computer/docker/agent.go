@@ -28,8 +28,8 @@ type Agent struct {
 	Category        string `json:"category"`
 	ApiDoc          string `json:"apiDoc"`
 	Price           string `json:"price"`
-	DockerImageLink string `json:"dockerImageLink"`  // image name
-	ApiDefaultPort  int64  `json:"api_default_port"` // image port
+	DockerImageLink string `json:"dockerImageLink"`   // image name
+	DefaultPort     int64  `json:"dockerDefaultPort"` // image port
 }
 
 // 查询agent信息
@@ -77,7 +77,7 @@ func startAgents(containers []types.Container) error {
 		agent := agentMap[k]
 		dockerfileds := DockerFileds{
 			Image:         agent.DockerImageLink,
-			Port:          agent.ApiDefaultPort,
+			Port:          agent.DefaultPort,
 			HostPort:      index_Port,
 			ContainerName: agent.Id,
 		}

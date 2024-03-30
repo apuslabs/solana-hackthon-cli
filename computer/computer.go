@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"solana-hackthon-cli/computer/docker"
 	"solana-hackthon-cli/computer/monitor"
+	"solana-hackthon-cli/config"
 	"strings"
 	"time"
 )
@@ -14,10 +15,11 @@ var cuda_version string
 
 // 检查 nvidia-smi 查看是否有检查docker环境版本
 func Init() monitor.GpuNode {
-
-	cuda_version = CheckNvidiaSmi()
-	fmt.Println("cuda version: ", cuda_version)
-	GpuCardCheck()
+	if !config.SkipGpu {
+		cuda_version = CheckNvidiaSmi()
+		fmt.Println("cuda version: ", cuda_version)
+		GpuCardCheck()
+	}
 
 	CheckGit()
 	CheckDocker()

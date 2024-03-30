@@ -158,6 +158,9 @@ func GetDisk() int64 {
 }
 
 func GetGpu() string {
+	if config.SkipGpu {
+		return "NVIDIA RTX 4090"
+	}
 	query := `from(bucket: "gpu")
 			  |> range(start: -2m)
 			  |> filter(fn: (r) => r["_measurement"] == "nvidia_smi")

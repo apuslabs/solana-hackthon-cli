@@ -5,13 +5,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"net/http"
 	"solana-hackthon-cli/ca"
 	"solana-hackthon-cli/computer"
 	"solana-hackthon-cli/computer/monitor"
 	"solana-hackthon-cli/config"
-	"solana-hackthon-cli/server"
 )
 
 // 启动预设，检查环境信息。查询计算机配置，生成节点keypaire， 注册节点信息(如果第一次启动的话)
@@ -40,23 +38,14 @@ func register(gpuNode monitor.GpuNode) error {
 	if err != nil {
 		return err
 	}
-	resp, err := http.Post(fmt.Sprintf("%s/register-gpu-node", config.ServerAddress), "application/json", bytes.NewReader(jsonData))
+	url := fmt.Sprintf("%s/register-gpu-node", config.ServerAddress)
+	resp, err := http.Post(url, "application/json", bytes.NewReader(jsonData))
 	if err != nil {
 		return err
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != 200 {
 		return errors.New(resp.Status)
-	}
-	bytes, _ := io.ReadAll(resp.Body)
-	var response server.Response
-	err = json.Unmarshal(bytes, &response)
-	if err != nil {
-		return err
-	}
-	fmt.Println("register node response: ", response)
-	if response.Code != 200 {
-		return errors.New(response.Msg)
 	}
 	return nil
 }
