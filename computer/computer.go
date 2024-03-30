@@ -69,7 +69,7 @@ func CheckDockerCompose() {
 	if err != nil {
 		panic("cmd docker-compose -v error; msg:" + err.Error())
 	}
-	version := regexp.MustCompile("v\\d+(\\.\\d+)+").FindString(string(dockerVersionByte))
+	version := regexp.MustCompile("\\d+(\\.\\d+)+").FindString(string(dockerVersionByte))
 	fmt.Println("docker-compose version: ", version)
 }
 
