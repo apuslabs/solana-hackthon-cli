@@ -36,7 +36,11 @@ func Init() {
 		panic(err)
 	}
 	startTelegraf(containers)
-	startAgents(containers)
+	err = startAgents(containers)
+	if err != nil {
+		fmt.Println(" can not pull agents; msg: ", err.Error())
+		panic(err)
+	}
 	loopPullAgent()
 }
 

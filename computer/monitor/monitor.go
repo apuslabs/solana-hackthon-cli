@@ -28,9 +28,9 @@ func Init() GpuNode {
 	fmt.Printf("memory size : %d MB\n", memory)
 	disk := GetDisk() / (1024 * 1024 * 1024)
 	fmt.Printf("disk size : %d GB\n", disk)
-	cards := GetGpu()
-	fmt.Println("cards : ", cards)
-	return GpuNode{CpuCores: core, Memory: memory, Storage: disk, Cards: cards}
+	cardName := GetGpu()
+	fmt.Println("GpuCardModel : ", cardName)
+	return GpuNode{CpuCores: core, Memory: memory, Storage: disk, GpuCardModel: cardName}
 }
 
 func RefreshHealth() {
@@ -157,7 +157,7 @@ func GetDisk() int64 {
 	return record.Value().(int64)
 }
 
-func GetGpu() []Card {
+func GetGpu() string {
 	query := `from(bucket: "gpu")
 			  |> range(start: -2m)
 			  |> filter(fn: (r) => r["_measurement"] == "nvidia_smi")
@@ -171,23 +171,26 @@ func GetGpu() []Card {
 		panic(result.Err())
 	}
 	defer result.Close()
-
-	cards := make(map[string]Card, 0)
-	for result.Next() {
-		record := result.Record()
-		if _, ok := record.Values()["uuid"]; !ok {
-			continue
-		}
-		cardUid := record.ValueByKey("uuid").(string)
-		cardName := record.ValueByKey("name").(string)
-		// MB
-		cardMemory := record.Value().(int64)
-		card := Card{Name: cardName, Memory: cardMemory}
-		cards[cardUid] = card
-	}
-	cardArr := make([]Card, 0)
-	for _, value := range cards {
-		cardArr = append(cardArr, value)
-	}
-	return cardArr
+	result.Next()
+	record := result.Record()
+	cardName := record.ValueByKey("name").(string)
+	return cardName
+	//cards := make(map[string]Card, 0)
+	//for result.Next() {
+	//	record := result.Record()
+	//	if _, ok := record.Values()["uuid"]; !ok {
+	//		continue
+	//	}
+	//	cardUid := record.ValueByKey("uuid").(string)
+	//	cardName := record.ValueByKey("name").(string)
+	//	// MB
+	//	cardMemory := record.Value().(int64)
+	//	card := Card{Name: cardName, Memory: cardMemory}
+	//	cards[cardUid] = card
+	//}
+	//cardArr := make([]Card, 0)
+	//for _, value := range cards {
+	//	cardArr = append(cardArr, value)
+	//}
+	//return cardArr
 }

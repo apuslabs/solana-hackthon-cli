@@ -14,19 +14,20 @@ var cuda_version string
 
 // 检查 nvidia-smi 查看是否有检查docker环境版本
 func Init() monitor.GpuNode {
+
 	cuda_version = CheckNvidiaSmi()
 	fmt.Println("cuda version: ", cuda_version)
 	GpuCardCheck()
-	CheckDocker()
-	CheckDockerComputer()
+
 	CheckGit()
+	CheckDocker()
+	CheckDockerCompose()
 
 	docker.Init()
 	// 最好等一段时间,等基础信息启动并且执行有数据
 	time.Sleep(time.Duration(120) * time.Second)
-	node := monitor.Init()
-	node.CudaVersion = cuda_version
 
+	node := monitor.Init()
 	monitor.RefreshHealth()
 	return node
 }
@@ -61,7 +62,7 @@ func CheckDocker() {
 	fmt.Println("docker version: ", version)
 }
 
-func CheckDockerComputer() {
+func CheckDockerCompose() {
 	dockerVersionByte, err := exec.Command("docker-compose", "-v").Output()
 	if err != nil {
 		panic("cmd docker-compose -v error; msg:" + err.Error())

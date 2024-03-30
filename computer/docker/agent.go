@@ -1,8 +1,12 @@
 package docker
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/docker/docker/api/types"
+	"io"
+	"net/http"
+	"solana-hackthon-cli/config"
 	"strings"
 )
 
@@ -16,39 +20,49 @@ var agentTempMap = make(map[string]int)
 var hashPortMap = make(map[string]int64)
 
 type Agent struct {
+	Id              string `json:"id"`
 	Owner           string `json:"owner"`
-	Post            string `json:"post"`
+	Poster          string `json:"poster"`
 	Title           string `json:"title"`
-	Description     string `json:"description"`
-	ModelHash       string `json:"model_hash"` // container name: imageherf-hash
-	ModelType       string `json:"model_type"`
-	ApiType         string `json:"api_type"`
-	ApiDoc          string `json:"api_doc"`
+	Desc            string `json:"desc"`
+	Category        string `json:"category"`
+	ApiDoc          string `json:"apiDoc"`
 	Price           string `json:"price"`
-	DockerImageHref string `json:"docker_image_href"` // image name
-	ApiDefaultPort  int64  `json:"api_default_port"`  // image port
+	DockerImageLink string `json:"dockerImageLink"`  // image name
+	ApiDefaultPort  int64  `json:"api_default_port"` // image port
 }
 
 // 查询agent信息
-func Agents() []Agent {
-	return []Agent{}
+func Agents() ([]Agent, error) {
+	response, err := http.Get(fmt.Sprintf("%s/agents", config.ServerAddress))
+	if err != nil {
+		return []Agent{}, err
+	}
+	defer response.Body.Close()
+	var agents []Agent
+	body, _ := io.ReadAll(response.Body)
+	json.Unmarshal(body, &agents)
+	return agents, nil
 }
 
-func startAgents(containers []types.Container) {
+func startAgents(containers []types.Container) error {
 	// 拉取agentinfo
-	agents := Agents()
+	agents, err := Agents()
+	if err != nil {
+		return err
+	}
 	// agentinfo设置map缓存
 	for _, agent := range agents {
-		agentMap[agent.ModelHash] = agent
-		agentTempMap[agent.ModelHash] = 0
+		agentMap[agent.Id] = agent
+		agentTempMap[agent.Id] = 0
 	}
 	// 记录已经跑起来的容器和端口，创建的时候略过
 	for _, container := range containers {
 		cname := strings.TrimLeft(container.Names[0], "/")
 		if agent, ok := agentMap[cname]; ok {
 			port := int64(container.Ports[0].PublicPort)
-			hashPortMap[agent.ModelHash] = port
-			agentTempMap[agent.ModelHash] = 1
+			hashPortMap[agent.Id] = port
+			agentTempMap[agent.Id] = 1
 			if index_Port <= port {
 				index_Port = port + 1
 			}
@@ -62,18 +76,19 @@ func startAgents(containers []types.Container) {
 		}
 		agent := agentMap[k]
 		dockerfileds := DockerFileds{
-			Image:         agent.DockerImageHref,
+			Image:         agent.DockerImageLink,
 			Port:          agent.ApiDefaultPort,
 			HostPort:      index_Port,
-			ContainerName: agent.ModelHash,
+			ContainerName: agent.Id,
 		}
-		err := startImage(dockerfileds)
+		err = startImage(dockerfileds)
 		if err != nil {
-			fmt.Printf("create ai agent [%s] canister failed, msg: %s\n", agent.ModelHash, err.Error())
+			fmt.Printf("create ai agent [%s] canister failed, msg: %s\n", agent.Id, err.Error())
 			continue
 		}
 		index_Port = index_Port + 1
 	}
+	return nil
 }
 
 func GetPort(hash string) int64 {

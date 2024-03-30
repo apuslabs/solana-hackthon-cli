@@ -40,7 +40,7 @@ func register(gpuNode monitor.GpuNode) error {
 	if err != nil {
 		return err
 	}
-	resp, err := http.Post(config.Relayer_Url+"/registerNode", "application/json", bytes.NewReader(jsonData))
+	resp, err := http.Post(fmt.Sprintf("%s/register-gpu-node", config.ServerAddress), "application/json", bytes.NewReader(jsonData))
 	if err != nil {
 		return err
 	}

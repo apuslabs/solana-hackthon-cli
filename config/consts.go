@@ -6,6 +6,3 @@ const Influx_url = "http://127.0.0.1:8086"
 const Influx_org = "apus"
 
 const Influx_Health_Refresh_Time = 10
-
-const Relayer_Url = "https://domain"
-const Agent_url = ""
