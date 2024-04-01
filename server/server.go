@@ -2,14 +2,16 @@ package server
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"solana-hackthon-cli/computer/docker"
 	"solana-hackthon-cli/computer/monitor"
+
+	"github.com/gin-gonic/gin"
 )
 
 // 启动web服务，提供查询接口
 func Init() {
+	gin.SetMode(gin.DebugMode)
 	r := gin.Default()
 
 	r.GET("/healthCheck", HealthCheckHandler)
