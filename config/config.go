@@ -15,7 +15,7 @@ var SkipGpu bool
 
 func init() {
 	flag.StringVar(&OwnerPubkey, "ownerpubkey", "", "node owner publickey")
-	flag.StringVar(&ServerAddress, "serveraddress", "https://solapi.apus.network:3000", "register server address: https://host:port")
+	flag.StringVar(&ServerAddress, "serveraddress", "https://solapi.apus.network", "register server address: https://host:port")
 	flag.StringVar(&Price, "price", "0", "price for ai task")
 	flag.StringVar(&Endpoint, "endpoint", "", "endpoint for access this node: ip/domain")
 	flag.BoolVar(&SkipGpu, "skipgpu", false, "")
