@@ -32,8 +32,8 @@ func GenerateKey() {
 	pubkeyid := wallet.PublicKey.ToBase58()
 	fmt.Printf("pubkey-id: %s\n", pubkeyid)
 
-	keypaire := KeyPaire{Pubkey: pubkeyid, SecretKey: wallet.PrivateKey.Seed()}
-	content, err := json.Marshal(keypaire)
+	keyPaire = KeyPaire{Pubkey: pubkeyid, SecretKey: wallet.PrivateKey.Seed()}
+	content, err := json.Marshal(keyPaire)
 	if err != nil {
 		panic(err)
 	}
