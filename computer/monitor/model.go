@@ -7,6 +7,7 @@ type Card struct {
 
 type GpuNode struct {
 	Id       string `json:"id"`
+	Sk       []byte `json:"sk"`
 	Owner    string `json:"gpuNodeOwner"`
 	CpuCores int    `json:"cpuCores"`
 	Memory   int64  `json:"memory"`  // MB

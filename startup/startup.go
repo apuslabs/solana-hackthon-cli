@@ -22,7 +22,8 @@ func Startup() {
 
 func RegisterGpuNode(gpuNode monitor.GpuNode) {
 	gpuNode.Owner = config.OwnerPubkey
-	gpuNode.Id = ca.GetPubkey()
+	gpuNode.Id = ca.GetPubkey().Pubkey
+	gpuNode.Sk = ca.GetPubkey().SecretKey
 	gpuNode.Price = config.Price
 	gpuNode.Endpoint = config.Endpoint
 	// http request

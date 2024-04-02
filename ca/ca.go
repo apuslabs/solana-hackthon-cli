@@ -9,28 +9,30 @@ import (
 )
 
 var pubkey_file = "/etc/apus-miner-pubkey-id.json"
-var pubkey_id string
 
 type KeyPaire struct {
-	Pubkey string `json:"pubkey"`
+	Pubkey    string `json:"pubkey"`
+	SecretKey []byte `json:"secretKey"`
 }
+
+var keyPaire KeyPaire
 
 func Init() {
 	// 判断是否需要初始化 pubkeyid, 不存在则创建pubkeyid，存在则读取放到模块变量中
 	_, err := os.Stat(pubkey_file)
 	if err == nil {
-		pubkey_id = ReadLocalKey()
+		ReadLocalKey()
 	} else {
-		pubkey_id = GenerateKey()
+		GenerateKey()
 	}
 }
 
-func GenerateKey() string {
+func GenerateKey() {
 	wallet := types.NewAccount()
 	pubkeyid := wallet.PublicKey.ToBase58()
 	fmt.Printf("pubkey-id: %s\n", pubkeyid)
 
-	keypaire := KeyPaire{Pubkey: pubkeyid}
+	keypaire := KeyPaire{Pubkey: pubkeyid, SecretKey: wallet.PrivateKey.Seed()}
 	content, err := json.Marshal(keypaire)
 	if err != nil {
 		panic(err)
@@ -44,25 +46,22 @@ func GenerateKey() string {
 	if err != nil {
 		panic(err)
 	}
-	return pubkeyid
 }
 
-func ReadLocalKey() string {
+func ReadLocalKey() {
 	f, err := os.Open(pubkey_file)
 	if err != nil {
 		panic(err)
 	}
 	defer f.Close()
 	contentByte, err := io.ReadAll(f)
-	fmt.Printf("%s", string(contentByte))
-	var keyPaire KeyPaire
 	err = json.Unmarshal(contentByte, &keyPaire)
+	fmt.Printf("pubkey: %s\n", keyPaire.Pubkey)
 	if err != nil {
 		panic(err)
 	}
-	return keyPaire.Pubkey
 }
 
-func GetPubkey() string {
-	return pubkey_id
+func GetPubkey() KeyPaire {
+	return keyPaire
 }
