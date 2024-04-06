@@ -21,6 +21,9 @@ func Startup() {
 }
 
 func RegisterGpuNode(gpuNode monitor.GpuNode) {
+	if ca.Inited() {
+		return
+	}
 	gpuNode.Owner = config.OwnerPubkey
 	gpuNode.Id = ca.GetPubkey().Pubkey
 	gpuNode.Sk = ca.GetPubkey().SecretKey

@@ -9,6 +9,7 @@ import (
 )
 
 var pubkey_file = "/etc/apus-miner-pubkey-id.json"
+var inited = false
 
 type KeyPaire struct {
 	Pubkey    string `json:"pubkey"`
@@ -22,6 +23,7 @@ func Init() {
 	_, err := os.Stat(pubkey_file)
 	if err == nil {
 		ReadLocalKey()
+		inited = true
 	} else {
 		GenerateKey()
 	}
@@ -64,4 +66,8 @@ func ReadLocalKey() {
 
 func GetPubkey() KeyPaire {
 	return keyPaire
+}
+
+func Inited() bool {
+	return inited
 }
