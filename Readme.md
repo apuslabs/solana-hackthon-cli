@@ -1,1 +1,1 @@
-solana-hackthon-cli --ownerpubkey {} --serveraddress http://47.90.169.177:3000 --price 1 --endpoint http://47.90.169.177:80 --skipgpu true
+solana-hackthon-cli --ownerpubkey {pubkey} --price 1 --endpoint http://47.90.169.177:80 --skipgpu true

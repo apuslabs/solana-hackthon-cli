@@ -66,14 +66,14 @@ func RefreshHealth() {
 				}
 				defer result.Close()
 
-				usePreMap := make(map[string]int, 0)
+				usePreMap := make(map[string]int64, 0)
 				for result.Next() {
 					record := result.Record()
 					if _, ok := record.Values()["uuid"]; !ok {
 						continue
 					}
 					cardUid := record.ValueByKey("uuid").(string)
-					usePre := record.Value().(int)
+					usePre := record.Value().(int64)
 					usePreMap[cardUid] = usePre
 				}
 
