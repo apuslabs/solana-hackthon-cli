@@ -25,14 +25,14 @@ func RegisterGpuNode(gpuNode monitor.GpuNode) {
 		return
 	}
 	gpuNode.Owner = config.OwnerPubkey
-	gpuNode.Id = ""
+	gpuNode.Id = "null"
 	// gpuNode.Sk = ca.GetPubkey().SecretKey
 	gpuNode.Price = config.Price
 	gpuNode.Endpoint = config.Endpoint
 	// http request
 	err := register(gpuNode)
 	if err != nil {
-		fmt.Println("注册机器节点上链失败", err)
+		fmt.Println("注册机器节点上链失败", err.Error())
 		panic(err)
 	}
 	fmt.Println("注册机器节点上链成功")
@@ -56,7 +56,10 @@ func register(gpuNode monitor.GpuNode) error {
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != 200 {
-		return errors.New(resp.Status)
+		// read the body as text
+		buf := new(bytes.Buffer)
+		buf.ReadFrom(resp.Body)
+		return errors.New(buf.String())
 	}
 	var registerResponse RegisterGPUNodeResponse
 	err = json.NewDecoder(resp.Body).Decode(&registerResponse)
