@@ -15,6 +15,6 @@ type GpuNode struct {
 	//CudaVersion string `json:"cuda_version"`
 	//Cards    []Card `json:"cards"`
 	GpuCardModel string `json:"gpuCardModel"`
-	Price        string `json:"price"`
+	Price        int64  `json:"price"`
 	Endpoint     string `json:"endpoint"` // ip or domain
 }

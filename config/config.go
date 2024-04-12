@@ -8,7 +8,7 @@ import (
 
 var OwnerPubkey string
 var ServerAddress string
-var Price string
+var Price int64
 var Endpoint string
 
 var SkipGpu bool
@@ -16,7 +16,7 @@ var SkipGpu bool
 func init() {
 	flag.StringVar(&OwnerPubkey, "ownerpubkey", "", "node owner publickey")
 	flag.StringVar(&ServerAddress, "serveraddress", "https://solapi.apus.network", "register server address: https://host:port")
-	flag.StringVar(&Price, "price", "0", "price for ai task")
+	flag.Int64Var(&Price, "price", 0, "price for ai task")
 	flag.StringVar(&Endpoint, "endpoint", "", "endpoint for access this node: ip/domain")
 	flag.BoolVar(&SkipGpu, "skipgpu", false, "")
 }
