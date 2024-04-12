@@ -1,9 +1,10 @@
 package docker
 
 import (
-	"github.com/docker/docker/api/types"
 	"os/exec"
 	"strings"
+
+	"github.com/docker/docker/api/types"
 )
 
 const git_local = "https://github.com/apuslabs/solana-hackthon-images.git"

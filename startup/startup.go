@@ -25,8 +25,8 @@ func RegisterGpuNode(gpuNode monitor.GpuNode) {
 		return
 	}
 	gpuNode.Owner = config.OwnerPubkey
-	gpuNode.Id = ca.GetPubkey().Pubkey
-	gpuNode.Sk = ca.GetPubkey().SecretKey
+	gpuNode.Id = ""
+	// gpuNode.Sk = ca.GetPubkey().SecretKey
 	gpuNode.Price = config.Price
 	gpuNode.Endpoint = config.Endpoint
 	// http request
@@ -35,6 +35,13 @@ func RegisterGpuNode(gpuNode monitor.GpuNode) {
 		fmt.Println("注册机器节点上链失败", err)
 		panic(err)
 	}
+	fmt.Println("注册机器节点上链成功")
+}
+
+type RegisterGPUNodeResponse struct {
+	Id string `json:"id"`
+	Sk string `json:"sk"`
+	Tx string `json:"tx"`
 }
 
 func register(gpuNode monitor.GpuNode) error {
@@ -51,5 +58,11 @@ func register(gpuNode monitor.GpuNode) error {
 	if resp.StatusCode != 200 {
 		return errors.New(resp.Status)
 	}
+	var registerResponse RegisterGPUNodeResponse
+	err = json.NewDecoder(resp.Body).Decode(&registerResponse)
+	if err != nil {
+		return err
+	}
+	ca.SaveLocalKey(registerResponse.Id, registerResponse.Sk)
 	return nil
 }

@@ -3,9 +3,10 @@ package ca
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/blocto/solana-go-sdk/types"
 	"io"
 	"os"
+
+	"github.com/blocto/solana-go-sdk/types"
 )
 
 var pubkey_file = "/etc/apus-miner-pubkey-id.json"
@@ -25,7 +26,7 @@ func Init() {
 		ReadLocalKey()
 		inited = true
 	} else {
-		GenerateKey()
+		// GenerateKey()
 	}
 }
 
@@ -50,6 +51,47 @@ func GenerateKey() {
 	}
 }
 
+func SaveLocalKey(pubKey string, secretKey string) {
+	keyPaire = KeyPaire{Pubkey: pubKey, SecretKey: []byte(secretKey)}
+	content, err := json.Marshal(keyPaire)
+	if err != nil {
+		panic(err)
+	}
+	// check if file exists
+	_, err = os.Stat(pubkey_file)
+	if err != nil {
+		if _, ok := err.(*os.PathError); ok {
+			// create file
+			f, err := os.Create(pubkey_file)
+			if err != nil {
+				panic(err)
+			}
+			defer func() {
+				if cerr := f.Close(); cerr != nil {
+					panic(cerr)
+				}
+			}()
+		} else {
+			panic(err)
+		}
+	}
+	// read file
+	f, err := os.OpenFile(pubkey_file, os.O_WRONLY, 0666)
+	defer func() {
+		if cerr := f.Close(); cerr != nil {
+			panic(cerr)
+		}
+	}()
+	if err != nil {
+		panic(err)
+	}
+	// write file
+	_, err = f.Write(content)
+	if err != nil {
+		panic(err)
+	}
+}
+
 func ReadLocalKey() {
 	f, err := os.Open(pubkey_file)
 	if err != nil {
@@ -57,6 +99,9 @@ func ReadLocalKey() {
 	}
 	defer f.Close()
 	contentByte, err := io.ReadAll(f)
+	if err != nil {
+		panic(err)
+	}
 	err = json.Unmarshal(contentByte, &keyPaire)
 	fmt.Printf("pubkey: %s\n", keyPaire.Pubkey)
 	if err != nil {
